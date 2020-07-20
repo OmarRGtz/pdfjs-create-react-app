@@ -1,26 +1,60 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect} from 'react';
+import pdfjs from "pdfjs-dist"
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
+
+import helloWorldPDF from "./helloworld.pdf";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+    //Needs debug, console has a Warning: Setting up fake worker.
+    pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+    useEffect(() => {
+        const loadingTask = pdfjs.getDocument(helloWorldPDF);
+
+        loadingTask.promise.then((doc) => {
+
+            console.log("pdf loaded");
+
+            var pageNumber = 1;
+            doc.getPage(pageNumber).then((page) => {
+                    console.log("page loaded");
+                    var scale = 1.5;
+                    var viewport = page.getViewport({scale: scale});
+
+                    var canvas = document.getElementById("the-canvas");
+                    var context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    // Render PDF page into canvas context
+                    var renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+
+                    var renderTask = page.render(renderContext);
+                    renderTask.promise.then(function () {
+                        console.log('Page rendered');
+                    });
+                }
+            );
+        }, function (reason) {
+            // PDF loading error
+            console.error(reason);
+        });
+        // eslint-disable-next-line
+    }, []);
+
+    return (
+        <div className="App">
+            <h1>PDF.js 'Hello, world!' example</h1>
+            <canvas style={{
+                border: "1px solid black",
+                direction: "ltr"
+            }} id="the-canvas"/>
+        </div>
+    );
 }
 
 export default App;

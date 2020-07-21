@@ -16,24 +16,24 @@ function App() {
 
             console.log("pdf loaded");
 
-            var pageNumber = 1;
+            const pageNumber = 1;
             doc.getPage(pageNumber).then((page) => {
                     console.log("page loaded");
-                    var scale = 1.5;
-                    var viewport = page.getViewport({scale: scale});
+                    const scale = 1.5;
+                    const viewport = page.getViewport({scale: scale});
 
-                    var canvas = document.getElementById("the-canvas");
-                    var context = canvas.getContext('2d');
+                    const canvas = document.getElementById("the-canvas");
+                    const context = canvas.getContext('2d');
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
 
                     // Render PDF page into canvas context
-                    var renderContext = {
+                    const renderContext = {
                         canvasContext: context,
                         viewport: viewport
                     };
 
-                    var renderTask = page.render(renderContext);
+                    const renderTask = page.render(renderContext);
                     renderTask.promise.then(function () {
                         console.log('Page rendered');
                     });
